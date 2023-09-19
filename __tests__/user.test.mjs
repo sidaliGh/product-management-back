@@ -9,8 +9,8 @@ const { expect } = chai;
 describe('Login Test', () => {
   it('should log in an existing user with correct credentials', async () => {
     const loginData = {
-      email: 'sidalighettas@gmail.com', 
-      password: 'securepassword',      
+      email: 'yourname@gmail.com', 
+      password: 'yourpassword',      
     };
 
     // Make a POST request to the login endpoint 
@@ -19,7 +19,7 @@ describe('Login Test', () => {
     
     expect(response).to.have.status(200);
     expect(response.body).to.have.property('message').to.include('Authentication successful');
-    expect(response.body).to.have.property('token');
+    expect(response.body).to.have.property('user');
   });
 
   
