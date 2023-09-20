@@ -8,6 +8,7 @@ const getAllProducts = async (req, res) => {
   try {
     const ITEMS_PER_PAGE = 10;
     const page = parseInt(req.query.page) || 1;
+    const keyword = req.query.keyword || ''; 
 
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -16,11 +17,18 @@ const getAllProducts = async (req, res) => {
 
     const skip = (page - 1) * ITEMS_PER_PAGE;
 
-    const products = await Product.find()
+    const filter = {
+      name: {
+        $regex: keyword,
+        $options: 'i',
+      },
+    };
+
+    const products = await Product.find(filter)
       .skip(skip)
       .limit(ITEMS_PER_PAGE);
 
-    const totalProducts = await Product.countDocuments();
+    const totalProducts = await Product.countDocuments(filter);
 
     res.status(200).json({
       products,
@@ -32,6 +40,7 @@ const getAllProducts = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
+
 
 const getProduct = async (req, res) => {
   try {
