@@ -69,7 +69,7 @@ const getMostOrderedProducts = async (req, res) => {
       return res.status(400).json({ errors: errors.array() });
     }
 
-    // Count the number of times each product has been ordered
+    // Count the number of times each product has been ordered.
     const productOrderCounts = await Order.aggregate([
       { $unwind: '$orderItems' },
       {
@@ -80,10 +80,10 @@ const getMostOrderedProducts = async (req, res) => {
       },
     ]);
 
-    // Sort products by order count in descending order
+    // Sort products by order count in descending order.
     productOrderCounts.sort((a, b) => b.count - a.count);
 
-    // Apply pagination and get most ordered products
+    // Apply pagination and get most ordered products.
     const skip = (page - 1) * ITEMS_PER_PAGE;
     const mostOrderedProducts = await Product.find({
       _id: { $in: productOrderCounts.map((item) => item._id) },

@@ -1,5 +1,5 @@
 import express from 'express'
-import { body, check, param } from 'express-validator'
+import { body, check } from 'express-validator'
 import {
   addProduct,
   deleteProduct,
