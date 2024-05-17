@@ -30,22 +30,22 @@ const registerUser = async (req, res) => {
       return next(error)
     }
 
-    // Create a new user with the hashed password
+    // Create a new user with the hashed password.
     const user = new User({ name, email, password: hashedPassword })
 
-    // Save the user to the database
+    // Save the user to the database.
     await user.save()
 
-    // Generate token for email verification
+    // Generate token for email verification.
     const activationToken = jwt.sign(
       { userId: user._id },
       process.env.JWT_SECRET,
       {
-        expiresIn: '1h', // Token expires in 1 hour
+        expiresIn: '1h', // Token expires in 1 hour.
       }
     )
 
-    // Compose the activation email
+    // Compose the activation email.
     const activationLink = `${process.env.APP_BASE_URL}/activate/${activationToken}`
     const mailOptions = {
       from: process.env.GMAIL_USER,
@@ -54,7 +54,7 @@ const registerUser = async (req, res) => {
       text: `Click the following link to activate your account: ${activationLink}`,
     }
 
-    // Send the activation email
+    // Send the activation email.
     await transporter.sendMail(mailOptions)
 
     res
@@ -68,14 +68,14 @@ const registerUser = async (req, res) => {
   }
 }
 
-// Activate user account
+// Activate user account.
 const activateUser = async (req, res) => {
   try {
     const { token } = req.params
     const decodedToken = jwt.verify(token, process.env.JWT_SECRET)
     const userId = decodedToken.userId
 
-    // Find and update the user's account status
+    // Find and update the user's account status.
     const user = await User.findById(userId)
     if (!user) {
       return res.status(404).json({ error: 'User not found' })
@@ -95,10 +95,10 @@ const loginUser = async (req, res) => {
   try {
     const { email } = req.body
 
-    // Trim and store the received password
+    // Trim and store the received password.
     const receivedPassword = req.body.password.trim()
 
-    // Check if the user exists
+    // Check if the user exists.
     const user = await User.findOne({ email })
 
     if (!user) {
@@ -116,26 +116,26 @@ const loginUser = async (req, res) => {
         .json({ message: 'Authentication failed - incorrect password' })
     }
 
-    // Check if the user is activated
+    // Check if the user is activated.
     if (!user.isActivated) {
       return res
         .status(401)
         .json({ message: 'Authentication failed - account not activated' })
     }
 
-    // Generate a JWT token with user information
+    // Generate a JWT token with user information.
     const token = jwt.sign(
       {
         userId: user._id,
         name: user.name,
         email: user.email,
-        role: user.role, // Include the user's role in the token
+        role: user.role, // Include the user's role in the token.
       },
       process.env.JWT_SECRET,
       { expiresIn: '10d' }
     )
 
-    // Return the token and a success message
+    // Return the token and a success message.
     res.status(200).json({
       message: 'Authentication successful',
       user: token,
@@ -146,7 +146,7 @@ const loginUser = async (req, res) => {
   }
 }
 
-// Generate a unique token for password reset
+// Generate a unique token for password reset.
 const generatePasswordResetToken = async (req, res) => {
   try {
     const { email } = req.body
@@ -156,10 +156,10 @@ const generatePasswordResetToken = async (req, res) => {
       return res.status(404).json({ error: 'User not found' })
     }
 
-    // Create a reset password token with a 1-hour expiration
+    // Create a reset password token with a 1-hour expiration.
     const resetPasswordToken = crypto.randomBytes(32).toString('hex')
     user.resetPasswordToken = resetPasswordToken
-    user.resetPasswordTokenExpiry = Date.now() + 3600000 // 1 hour
+    user.resetPasswordTokenExpiry = Date.now() + 3600000 //expired after 1 hour
 
     await user.save()
 
